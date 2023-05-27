@@ -8,7 +8,6 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 
 contract MyToken is ERC1155, ERC1155Supply, Ownable {
     using Strings for uint256;
-    uint96 public totalSupply;
     string private _uri;
     string public baseExtension = ".json";
     string public name;
@@ -24,11 +23,15 @@ contract MyToken is ERC1155, ERC1155Supply, Ownable {
         _uri = _URI;
     }
 
-    function mint(uint96 tokenAmount, uint96 amount) public onlyOwner {
-        for (uint i; i < tokenAmount; i++) {
-            _mint(msg.sender, totalSupply + i, amount, "");
-        }
-        totalSupply = totalSupply + tokenAmount;
+    function mintBatch(uint256 id, uint256 amount) public onlyOwner {
+        _mint(msg.sender, id, amount, "");
+    }
+
+    function mintBatch(
+        uint256[] memory ids,
+        uint256[] memory amounts
+    ) public onlyOwner {
+        _mintBatch(msg.sender, ids, amounts, "");
     }
 
     function setURI(string memory newuri) public onlyOwner {
