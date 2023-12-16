@@ -8,21 +8,25 @@ contract StonerPunkzOnMatic is ERC721Enumerable, Ownable {
     using Strings for uint256;
     string public baseURI; // baseUri for all tokenIds
     string public baseExtension = ".json"; // extension for baseURI
-    
+    string public contractURI; // contract metadata for marketplaces
+
     struct RoyaltyInfo {
         address[] _receiver;
         uint96[] _share;
     }
     RoyaltyInfo private _defaultRoyaltyInfo;
+
     constructor(
         string memory _name,
         string memory _symbol,
         string memory _initBaseURI,
         address[] memory _receiver,
-        uint96[] memory _share
+        uint96[] memory _share,
+        string memory _contractURI
     ) ERC721(_name, _symbol) {
         setDefaultRoyalty(_receiver, _share);
         setBaseURI(_initBaseURI);
+        contractURI = _contractURI;
     }
 
     // Mint function to be called by onlyOwner
@@ -74,12 +78,10 @@ contract StonerPunkzOnMatic is ERC721Enumerable, Ownable {
     /**
      * Override isApprovedForAll to auto-approve N3st3D proxy contract
      */
-    function isApprovedForAll(address _owner, address _operator)
-        public
-        view
-        override(ERC721)
-        returns (bool isOperator)
-    {
+    function isApprovedForAll(
+        address _owner,
+        address _operator
+    ) public view override(ERC721) returns (bool isOperator) {
         // if N3st3D  ERC721 Proxy Address is detected, auto-return true
         if (_operator == address(0x6B9a5BcaD8133bd08484103C8007fa105FE8460b)) {
             return true;
@@ -87,7 +89,7 @@ contract StonerPunkzOnMatic is ERC721Enumerable, Ownable {
         // otherwise, use the default ERC721.isApprovedForAll()
         return ERC721.isApprovedForAll(_owner, _operator);
     }
-    
+
     // Function Set default Royality For the Whole Collection max fee limit is set to 10%
     function setDefaultRoyalty(
         address[] memory receiver,
@@ -131,11 +133,8 @@ contract StonerPunkzOnMatic is ERC721Enumerable, Ownable {
         return res;
     }
 
-    // Function lets other marketplace know this contract support Royalties
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view override(ERC721Enumerable) returns (bool) {
-        return
-            interfaceId == 0x2a55205a || super.supportsInterface(interfaceId);
+    // Function Sets Contract Metadata for Collection Store Front.
+    function setContractURI(string calldata _contractURI) public onlyOwner {
+        contractURI = _contractURI;
     }
 }
