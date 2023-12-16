@@ -130,4 +130,12 @@ contract StonerPunkzOnMatic is ERC721Enumerable, Ownable {
         }
         return res;
     }
+
+    // Function lets other marketplace know this contract support Royalties
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721Enumerable) returns (bool) {
+        return
+            interfaceId == 0x2a55205a || super.supportsInterface(interfaceId);
+    }
 }
